@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Firebase</title>
+</head>
+
+<body>
+
+    <button id="googleLogin">Sign in With Google</button>
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js';
+        import {
+            getAuth,
+            GoogleAuthProvider,
+            signInWithPopup,
+        } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ2d8hgIfmbpfvjvIJPY4VvbFR5jlxw18",
+            authDomain: "spotify-app-92303.firebaseapp.com",
+            projectId: "spotify-app-92303",
+            storageBucket: "spotify-app-92303.firebasestorage.app",
+            messagingSenderId: "663803751768",
+            appId: "1:663803751768:web:6182026a5746f69d56492d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        const googleProvider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+
+        document
+            .getElementById('googleLogin')
+            .addEventListener('click', async () => {
+                let firebaseResult = await signInWithPopup(
+                    auth,
+                    googleProvider,
+                ).catch((err) => {
+                    console.log('ERROR', err);
+                    return false;
+                });
+
+                if (!firebaseResult) alert('Something went wrong');
+
+                let token = firebaseResult.user.accessToken;
+                console.log(token)
+                let result = await fetch('http://localhost:3000/api/auth/firebase', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token,
+                    }),
+                });
+                console.log(result);
+                let response = await result.json();
+            });
+    </script>
+</body>
+
+</html>
